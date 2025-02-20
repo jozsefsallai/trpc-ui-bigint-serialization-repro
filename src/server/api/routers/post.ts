@@ -6,11 +6,13 @@ import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 interface Post {
   id: number;
   name: string;
+  claps: bigint;
 }
 const posts: Post[] = [
   {
     id: 1,
     name: "Hello World",
+    claps: 0n,
   },
 ];
 
@@ -24,11 +26,17 @@ export const postRouter = createTRPCRouter({
     }),
 
   create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
+    .input(
+      z.object({
+        name: z.string().min(1),
+        claps: z.bigint().default(0n),
+      }),
+    )
     .mutation(async ({ input }) => {
       const post: Post = {
         id: posts.length + 1,
         name: input.name,
+        claps: input.claps,
       };
       posts.push(post);
       return post;
